@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
+import { createRecording, RecordingPreset } from 'expo-audio';
 import { Audio } from 'expo-av';
 import { AudioRecordingState } from '@/types';
 
 export function useAudioRecording() {
-  const [recording, setRecording] = useState<Audio.Recording | null>(null);
+  const [recording, setRecording] = useState<any | null>(null);
   const [recordingState, setRecordingState] = useState<AudioRecordingState>({
     isRecording: false,
     duration: 0,
@@ -14,7 +15,7 @@ export function useAudioRecording() {
   useEffect(() => {
     return () => {
       if (recording) {
-        recording.stopAndUnloadAsync().catch(console.error);
+        recording.stopAsync().catch(console.error);
       }
     };
   }, [recording]);
@@ -31,25 +32,12 @@ export function useAudioRecording() {
         }
       }
 
-      // Configure audio mode for recording
-      await Audio.setAudioModeAsync({
-        allowsRecordingIOS: true,
-        playsInSilentModeIOS: true,
+      console.log('Starting recording...');
+      const newRecording = await createRecording({
+        ...RecordingPreset.HIGH_QUALITY,
       });
 
-      console.log('Starting recording...');
-      const { recording: newRecording } = await Audio.Recording.createAsync(
-        Audio.RecordingOptionsPresets.HIGH_QUALITY,
-        (status) => {
-          // Update duration during recording
-          if (status.isRecording) {
-            setRecordingState((prev) => ({
-              ...prev,
-              duration: Math.floor(status.durationMillis / 1000),
-            }));
-          }
-        }
-      );
+      await newRecording.record();
 
       setRecording(newRecording);
       setRecordingState({
@@ -72,14 +60,8 @@ export function useAudioRecording() {
 
     try {
       console.log('Stopping recording...');
-      await recording.stopAndUnloadAsync();
+      const uri = await recording.stop();
 
-      // Reset audio mode
-      await Audio.setAudioModeAsync({
-        allowsRecordingIOS: false,
-      });
-
-      const uri = recording.getURI();
       console.log('Recording stopped, file location:', uri);
 
       setRecording(null);
@@ -100,10 +82,7 @@ export function useAudioRecording() {
     if (!recording) return;
 
     try {
-      await recording.stopAndUnloadAsync();
-      await Audio.setAudioModeAsync({
-        allowsRecordingIOS: false,
-      });
+      await recording.stop();
 
       setRecording(null);
       setRecordingState({

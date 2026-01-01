@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { View, StyleSheet, TouchableOpacity } from 'react-native';
-import { Audio } from 'expo-av';
+import { useAudioPlayer } from 'expo-audio';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { ThemedText } from '@/components/themed-text';
 import { useThemeColor } from '@/hooks/use-theme-color';
@@ -11,76 +11,51 @@ interface AudioPlayerProps {
 }
 
 export function AudioPlayer({ audioUrl, autoPlay = false }: AudioPlayerProps) {
-  const [sound, setSound] = useState<Audio.Sound | null>(null);
-  const [isPlaying, setIsPlaying] = useState(false);
+  const player = useAudioPlayer(audioUrl);
   const [duration, setDuration] = useState(0);
-  const [position, setPosition] = useState(0);
 
   const textColor = useThemeColor({}, 'text');
   const waveformColor = useThemeColor({}, 'waveform');
 
   useEffect(() => {
-    loadSound();
-    return () => {
-      if (sound) {
-        sound.unloadAsync();
-      }
-    };
-  }, [audioUrl]);
-
-  const loadSound = async () => {
-    try {
-      const { sound: newSound } = await Audio.Sound.createAsync(
-        { uri: audioUrl },
-        { shouldPlay: autoPlay },
-        onPlaybackStatusUpdate
-      );
-      setSound(newSound);
-    } catch (error) {
-      console.error('Error loading sound:', error);
+    if (player && autoPlay) {
+      player.play();
     }
-  };
+  }, [player, autoPlay]);
 
-  const onPlaybackStatusUpdate = (status: any) => {
-    if (status.isLoaded) {
-      setDuration(status.durationMillis || 0);
-      setPosition(status.positionMillis || 0);
-      setIsPlaying(status.isPlaying);
-
-      if (status.didJustFinish) {
-        setIsPlaying(false);
-        setPosition(0);
-      }
+  useEffect(() => {
+    if (player?.duration) {
+      setDuration(player.duration);
     }
-  };
+  }, [player?.duration]);
 
   const togglePlayback = async () => {
-    if (!sound) return;
+    if (!player) return;
 
-    if (isPlaying) {
-      await sound.pauseAsync();
+    if (player.playing) {
+      player.pause();
     } else {
-      if (position >= duration) {
-        await sound.setPositionAsync(0);
+      if (player.currentTime >= duration) {
+        player.seekTo(0);
       }
-      await sound.playAsync();
+      player.play();
     }
   };
 
-  const formatTime = (millis: number) => {
-    const seconds = Math.floor(millis / 1000);
+  const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
+    const secs = Math.floor(seconds % 60);
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
-  const progress = duration > 0 ? position / duration : 0;
+  const progress = duration > 0 ? (player?.currentTime || 0) / duration : 0;
+  const position = player?.currentTime || 0;
 
   return (
     <View style={styles.container}>
       <TouchableOpacity onPress={togglePlayback} style={styles.playButton}>
         <IconSymbol
-          name={isPlaying ? 'pause.fill' : 'play.fill'}
+          name={player?.playing ? 'pause.fill' : 'play.fill'}
           size={20}
           color={textColor}
         />
