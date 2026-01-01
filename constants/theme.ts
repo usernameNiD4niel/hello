@@ -17,18 +17,33 @@ export const GradientColors = {
 
 export const Colors = {
   light: {
-    text: '#11181C',
-    background: '#fff',
-    tint: tintColorLight,
-    icon: '#687076',
-    tabIconDefault: '#687076',
-    tabIconSelected: tintColorLight,
+    // Base colors
+    text: '#1A1A1A',
+    textSecondary: '#666666',
+    background: '#FFFFFF',
+    backgroundElevated: '#F5F5F5',
+    tint: '#E85D9A',
+    icon: '#666666',
+    tabIconDefault: '#666666',
+    tabIconSelected: '#E85D9A',
 
-    // Chat-specific colors (for light mode fallback)
-    userBubble: '#E85D9A',
-    botBubble: '#F5F5F5',
+    // Chat-specific colors
+    userBubbleStart: '#E85D9A', // Gradient start (pink)
+    userBubbleEnd: '#A855F7',   // Gradient end (purple)
+    botBubble: '#F0F0F0',
     inputBackground: '#FFFFFF',
     border: '#E0E0E0',
+
+    // Additional UI colors
+    cardBackground: '#FFFFFF',
+    divider: '#E0E0E0',
+    error: '#DC2626',
+    success: '#16A34A',
+    warning: '#F59E0B',
+
+    // Recording/Audio colors
+    recordingActive: '#A855F7',
+    waveform: '#E85D9A',
   },
   dark: {
     // Base colors

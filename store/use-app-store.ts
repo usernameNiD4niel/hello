@@ -5,6 +5,10 @@ import { UserPreferences, AuthState } from '@/types';
 import { DEFAULT_LANGUAGE } from '@/constants/languages';
 
 interface AppState {
+  // Onboarding
+  hasCompletedOnboarding: boolean;
+  completeOnboarding: () => void;
+
   // User preferences
   preferences: UserPreferences;
   setPreferences: (preferences: Partial<UserPreferences>) => void;
@@ -27,10 +31,14 @@ interface AppState {
 export const useAppStore = create<AppState>()(
   persist(
     (set) => ({
+      // Onboarding state
+      hasCompletedOnboarding: false,
+      completeOnboarding: () => set({ hasCompletedOnboarding: true }),
+
       // Initial preferences
       preferences: {
         defaultLanguage: DEFAULT_LANGUAGE,
-        theme: 'auto',
+        theme: 'dark', // Default to dark mode
         audioAutoplay: false,
         notificationsEnabled: true,
       },
@@ -70,6 +78,7 @@ export const useAppStore = create<AppState>()(
       name: 'app-storage',
       storage: createJSONStorage(() => AsyncStorage),
       partialize: (state) => ({
+        hasCompletedOnboarding: state.hasCompletedOnboarding,
         preferences: state.preferences,
         auth: state.auth,
       }),

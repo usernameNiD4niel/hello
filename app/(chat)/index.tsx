@@ -1,9 +1,11 @@
-import { View, FlatList, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, FlatList, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { router } from 'expo-router';
+import { LinearGradient } from 'expo-linear-gradient';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { useThemeColor } from '@/hooks/use-theme-color';
 import { IconSymbol } from '@/components/ui/icon-symbol';
+import { GradientColors } from '@/constants/theme';
 
 // Temporary mock data
 const MOCK_CONVERSATIONS = [
@@ -26,7 +28,7 @@ export default function ConversationListScreen() {
   const cardBackground = useThemeColor({}, 'cardBackground');
   const textColor = useThemeColor({}, 'text');
   const textSecondary = useThemeColor({}, 'textSecondary');
-  const dividerColor = useThemeColor({}, 'divider');
+  const borderColor = useThemeColor({}, 'border');
 
   const handleConversationPress = (id: string) => {
     router.push(`/(chat)/${id}`);
@@ -34,6 +36,24 @@ export default function ConversationListScreen() {
 
   const handleNewChat = () => {
     router.push('/new-chat');
+  };
+
+  const handleDeleteConversation = (id: string, title: string) => {
+    Alert.alert(
+      'Delete Conversation',
+      `Are you sure you want to delete "${title}"?`,
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: () => {
+            // TODO: Implement delete functionality
+            console.log('Delete conversation:', id);
+          },
+        },
+      ]
+    );
   };
 
   const formatTime = (date: Date) => {
@@ -51,11 +71,14 @@ export default function ConversationListScreen() {
   return (
     <ThemedView style={[styles.container, { backgroundColor }]}>
       <View style={styles.header}>
-        <ThemedText type="title" style={{ color: textColor }}>
-          Conversations
-        </ThemedText>
-        <TouchableOpacity onPress={handleNewChat} style={styles.newChatButton}>
-          <IconSymbol name="plus" size={24} color={textColor} />
+        <View>
+          <ThemedText style={styles.headerTitle}>Conversations</ThemedText>
+          <ThemedText style={styles.headerSubtitle}>
+            {MOCK_CONVERSATIONS.length} active {MOCK_CONVERSATIONS.length === 1 ? 'chat' : 'chats'}
+          </ThemedText>
+        </View>
+        <TouchableOpacity onPress={() => router.push('/settings')} style={styles.settingsButton}>
+          <IconSymbol name="gearshape.fill" size={24} color={textColor} />
         </TouchableOpacity>
       </View>
 
@@ -63,36 +86,71 @@ export default function ConversationListScreen() {
         data={MOCK_CONVERSATIONS}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
-          <TouchableOpacity
-            onPress={() => handleConversationPress(item.id)}
-            style={[styles.conversationItem, { backgroundColor: cardBackground }]}
-          >
-            <View style={styles.avatarContainer}>
-              <IconSymbol name="sparkles" size={24} color={textColor} />
-            </View>
-            <View style={styles.conversationContent}>
-              <View style={styles.conversationHeader}>
-                <ThemedText type="defaultSemiBold" style={{ color: textColor }}>
-                  {item.title}
-                </ThemedText>
-                <ThemedText style={{ color: textSecondary, fontSize: 12 }}>
-                  {formatTime(item.updatedAt)}
+          <View style={[styles.conversationCard, { backgroundColor: cardBackground, borderColor }]}>
+            <TouchableOpacity
+              onPress={() => handleConversationPress(item.id)}
+              style={styles.conversationTouchable}
+              activeOpacity={0.7}
+            >
+              <LinearGradient
+                colors={[GradientColors.pink, GradientColors.purple]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={styles.avatarContainer}
+              >
+                <ThemedText style={styles.avatarEmoji}>💬</ThemedText>
+              </LinearGradient>
+
+              <View style={styles.conversationContent}>
+                <View style={styles.conversationHeader}>
+                  <ThemedText style={styles.conversationTitle} numberOfLines={1}>
+                    {item.title}
+                  </ThemedText>
+                  <ThemedText style={styles.conversationTime}>
+                    {formatTime(item.updatedAt)}
+                  </ThemedText>
+                </View>
+                <ThemedText style={styles.conversationPreview} numberOfLines={2}>
+                  {item.lastMessage}
                 </ThemedText>
               </View>
-              <ThemedText
-                style={{ color: textSecondary, fontSize: 14 }}
-                numberOfLines={1}
-              >
-                {item.lastMessage}
-              </ThemedText>
-            </View>
-          </TouchableOpacity>
-        )}
-        ItemSeparatorComponent={() => (
-          <View style={[styles.separator, { backgroundColor: dividerColor }]} />
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={() => handleDeleteConversation(item.id, item.title)}
+              style={styles.deleteButton}
+            >
+              <IconSymbol name="trash" size={20} color="#FF4444" />
+            </TouchableOpacity>
+          </View>
         )}
         contentContainerStyle={styles.listContent}
+        ListEmptyComponent={
+          <View style={styles.emptyContainer}>
+            <ThemedText style={styles.emptyEmoji}>💬</ThemedText>
+            <ThemedText style={styles.emptyTitle}>No conversations yet</ThemedText>
+            <ThemedText style={styles.emptySubtitle}>
+              Start a new chat to begin
+            </ThemedText>
+          </View>
+        }
       />
+
+      {/* Floating Action Button */}
+      <TouchableOpacity
+        style={styles.fab}
+        onPress={handleNewChat}
+        activeOpacity={0.8}
+      >
+        <LinearGradient
+          colors={[GradientColors.pink, GradientColors.purple]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.fabGradient}
+        >
+          <IconSymbol name="plus" size={28} color="#FFFFFF" />
+        </LinearGradient>
+      </TouchableOpacity>
     </ThemedView>
   );
 }
@@ -105,43 +163,115 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 20,
+    paddingHorizontal: 16,
     paddingTop: 60,
     paddingBottom: 20,
   },
-  newChatButton: {
+  headerTitle: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    marginBottom: 4,
+  },
+  headerSubtitle: {
+    fontSize: 14,
+    opacity: 0.6,
+  },
+  settingsButton: {
     padding: 8,
   },
   listContent: {
     paddingHorizontal: 16,
+    paddingBottom: 100,
   },
-  conversationItem: {
+  conversationCard: {
     flexDirection: 'row',
+    alignItems: 'center',
     padding: 16,
-    borderRadius: 12,
-    marginVertical: 4,
+    borderRadius: 16,
+    marginBottom: 12,
+    borderWidth: 1,
+  },
+  conversationTouchable: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   avatarContainer: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: '#A855F7',
+    width: 56,
+    height: 56,
+    borderRadius: 16,
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 12,
   },
+  avatarEmoji: {
+    fontSize: 28,
+  },
   conversationContent: {
     flex: 1,
-    justifyContent: 'center',
   },
   conversationHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 4,
+    marginBottom: 6,
   },
-  separator: {
-    height: 1,
-    marginVertical: 4,
+  conversationTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    flex: 1,
+    marginRight: 8,
+  },
+  conversationTime: {
+    fontSize: 12,
+    opacity: 0.6,
+  },
+  conversationPreview: {
+    fontSize: 14,
+    opacity: 0.6,
+    lineHeight: 20,
+  },
+  deleteButton: {
+    padding: 8,
+    marginLeft: 8,
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingTop: 100,
+  },
+  emptyEmoji: {
+    fontSize: 64,
+    marginBottom: 16,
+  },
+  emptyTitle: {
+    fontSize: 20,
+    fontWeight: '600',
+    marginBottom: 8,
+  },
+  emptySubtitle: {
+    fontSize: 14,
+    opacity: 0.6,
+  },
+  fab: {
+    position: 'absolute',
+    right: 16,
+    bottom: 24,
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
+  },
+  fabGradient: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
