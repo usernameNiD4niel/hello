@@ -1,12 +1,19 @@
 /**
- * Below are the colors that are used in the app. The colors are defined in the light and dark mode.
- * There are many other ways to style your app. For example, [Nativewind](https://www.nativewind.dev/), [Tamagui](https://tamagui.dev/), [unistyles](https://reactnativeunistyles.vercel.app), etc.
+ * Theme colors for the chatbot application.
+ * Primary design: Dark mode with pink/purple gradient accents.
  */
 
 import { Platform } from 'react-native';
 
 const tintColorLight = '#0a7ea4';
 const tintColorDark = '#fff';
+
+// Gradient colors for user messages and interactive elements
+export const GradientColors = {
+  pink: '#E85D9A',
+  purple: '#A855F7',
+  purpleDark: '#7C3AED',
+};
 
 export const Colors = {
   light: {
@@ -16,14 +23,41 @@ export const Colors = {
     icon: '#687076',
     tabIconDefault: '#687076',
     tabIconSelected: tintColorLight,
+
+    // Chat-specific colors (for light mode fallback)
+    userBubble: '#E85D9A',
+    botBubble: '#F5F5F5',
+    inputBackground: '#FFFFFF',
+    border: '#E0E0E0',
   },
   dark: {
-    text: '#ECEDEE',
-    background: '#151718',
+    // Base colors
+    text: '#FFFFFF',
+    textSecondary: '#A0A0A0',
+    background: '#000000',
+    backgroundElevated: '#1A1A1A',
     tint: tintColorDark,
-    icon: '#9BA1A6',
-    tabIconDefault: '#9BA1A6',
+    icon: '#A0A0A0',
+    tabIconDefault: '#A0A0A0',
     tabIconSelected: tintColorDark,
+
+    // Chat-specific colors
+    userBubbleStart: '#E85D9A', // Gradient start (pink)
+    userBubbleEnd: '#A855F7',   // Gradient end (purple)
+    botBubble: '#2A2A2A',
+    inputBackground: '#1A1A1A',
+    border: '#3A3A3A',
+
+    // Additional UI colors
+    cardBackground: '#1F1F1F',
+    divider: '#2A2A2A',
+    error: '#FF4444',
+    success: '#4CAF50',
+    warning: '#FFC107',
+
+    // Recording/Audio colors
+    recordingActive: '#A855F7',
+    waveform: '#E85D9A',
   },
 };
 
