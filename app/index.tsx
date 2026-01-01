@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { View, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
@@ -32,9 +33,9 @@ export default function HomeScreen() {
   const recentConversations = conversations.slice(0, 3);
 
   return (
-    <ThemedView style={styles.container}>
+    <SafeAreaView style={[styles.container, { backgroundColor }]} edges={['top']}>
       {/* Header */}
-      <View style={[styles.header, { backgroundColor }]}>
+      <View style={styles.header}>
         <View>
           <ThemedText style={styles.greeting}>Hello!</ThemedText>
           <ThemedText style={styles.subtitle}>How can I help you today?</ThemedText>
@@ -141,7 +142,7 @@ export default function HomeScreen() {
           <IconSymbol name="plus" size={28} color="#FFFFFF" />
         </View>
       </TouchableOpacity>
-    </ThemedView>
+    </SafeAreaView>
   );
 }
 
@@ -153,7 +154,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingTop: 60,
     paddingBottom: 20,
     paddingHorizontal: 16,
   },

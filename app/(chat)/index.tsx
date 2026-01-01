@@ -1,4 +1,5 @@
 import { View, FlatList, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import { ThemedText } from '@/components/themed-text';
@@ -69,7 +70,7 @@ export default function ConversationListScreen() {
   };
 
   return (
-    <ThemedView style={[styles.container, { backgroundColor }]}>
+    <SafeAreaView style={[styles.container, { backgroundColor }]} edges={['top']}>
       <View style={styles.header}>
         <View>
           <ThemedText style={styles.headerTitle}>Conversations</ThemedText>
@@ -151,7 +152,7 @@ export default function ConversationListScreen() {
           <IconSymbol name="plus" size={28} color="#FFFFFF" />
         </LinearGradient>
       </TouchableOpacity>
-    </ThemedView>
+    </SafeAreaView>
   );
 }
 
@@ -164,7 +165,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 16,
-    paddingTop: 60,
     paddingBottom: 20,
   },
   headerTitle: {

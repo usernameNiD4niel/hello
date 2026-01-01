@@ -3,7 +3,8 @@
     "allow": [
       "Bash(bun add:*)",
       "Bash(bun run start --help:*)",
-      "Bash(bun remove:*)"
+      "Bash(bun remove:*)",
+      "Bash(bun list:*)"
     ]
   }
 }

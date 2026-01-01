@@ -1,12 +1,13 @@
 import { useState } from 'react';
 import { View, StyleSheet, TouchableOpacity, ScrollView, Switch, Alert } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { useThemeColor } from '@/hooks/use-theme-color';
 import { useAppStore } from '@/store/use-app-store';
-import { LANGUAGES } from '@/constants/languages';
+import { SUPPORTED_LANGUAGES } from '@/constants/languages';
 import { GradientColors } from '@/constants/theme';
 
 export default function SettingsScreen() {
@@ -42,11 +43,11 @@ export default function SettingsScreen() {
     );
   };
 
-  const currentLanguage = LANGUAGES.find((l) => l.code === preferences.defaultLanguage);
+  const currentLanguage = SUPPORTED_LANGUAGES.find((l) => l.code === preferences.defaultLanguage);
 
   return (
-    <ThemedView style={styles.container}>
-      <View style={[styles.header, { backgroundColor }]}>
+    <SafeAreaView style={[styles.container, { backgroundColor }]} edges={['top']}>
+      <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
           <IconSymbol name="chevron.left" size={24} color={textColor} />
         </TouchableOpacity>
@@ -91,7 +92,7 @@ export default function SettingsScreen() {
               Alert.alert(
                 'Select Language',
                 'Choose your default language',
-                LANGUAGES.map((lang) => ({
+                SUPPORTED_LANGUAGES.map((lang) => ({
                   text: `${lang.flag} ${lang.name}`,
                   onPress: () => handleLanguageChange(lang.code),
                 }))
@@ -161,7 +162,7 @@ export default function SettingsScreen() {
 
         <View style={{ height: 40 }} />
       </ScrollView>
-    </ThemedView>
+    </SafeAreaView>
   );
 }
 
@@ -199,7 +200,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingTop: 60,
     paddingBottom: 16,
     paddingHorizontal: 16,
   },
